@@ -8,7 +8,13 @@ st.set_page_config(page_title="مكتبة القرآن الكريم الشامل
 st.warning("⚠️ تنبيه: التطبيق حالياً قيد التطوير والتحسين المستمر.")
 st.info("📱 تصميم مرن: هذا التطبيق يدعم التشغيل على جميع الهواتف الذكية والأجهزة اللوحية في العالم.")
 
+# إضافة صورة مميزة في أعلى التطبيق
+image_url = "https://images.unsplash.com/photo-1609599006353-e629aaabfeae?q=80&w=600&auto=format&fit=crop"
+st.image(image_url, use_container_width=True, caption="📖 المَصحَف الشَّرِيف")
+
+# عنوان التطبيق واسم المطور
 st.markdown("<h1 style='text-align: center;'>📖 مكتبة استماع القرآن الكريم الكبرى (114 سورة)</h1>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; color: #4CAF50; font-weight: bold; font-size: 1.2rem;'>تطوير المبرمج: محمد عادل أحمد</p>", unsafe_allow_html=True)
 st.markdown("<p style='text-align: center; color: gray;'>اضغط على الزر بالأسفل لفتح قائمة التلاوات لجميع سور القرآن الكريم</p>", unsafe_allow_html=True)
 
 st.write("---")
@@ -39,23 +45,20 @@ if st.button("🎧 اضغط هنا لفتح قائمة استماع القرآن
 if st.session_state.get("show_full_quran", False) and reciters_data:
     st.write("### 📜 اختر السطر المفضل لديك للاستماع فوراً:")
     
-    # قائمة اختيار لتصفية القراء عشان الصفحة ما تبقاش تقيلة وتفتح بسرعة على أي موبايل
     reciter_names = [r["name"] for r in reciters_data]
     selected_reciter = st.selectbox("🔍 اختر الشيخ أو القارئ لعرض كل سوره وتحميلها في سطور:", reciter_names)
     
-    # البحث عن بيانات القارئ المختار
     current_reciter_data = next((r for r in reciters_data if r["name"] == selected_reciter), None)
     
     if current_reciter_data:
         moshafs = current_reciter_data.get("moshaf", [])
         if moshafs:
             server_url = moshafs[0].get("server", "")
-            surah_list = moshafs[0].get("surah_list", "").split(",") # السور المتاحة بصوت الشيخ ده
+            surah_list = moshafs[0].get("surah_list", "").split(",")
             
             if server_url and surah_list:
                 st.write(f"--- تلاوات الشيخ **{selected_reciter}** المتاحة ---")
                 
-                # توليد السطور أوتوماتيكياً بناءً على السور اللي مسجلها الشيخ
                 for surah_id_str in surah_list:
                     if surah_id_str.strip():
                         surah_index = int(surah_id_str) - 1
@@ -66,17 +69,14 @@ if st.session_state.get("show_full_quran", False) and reciters_data:
                             line_text = f"🎙️ {selected_reciter} —— 📖 سورة {surah_name}"
                             audio_link = f"{server_url}/{formatted_id}.mp3"
                             
-                            # عمل كل سطر على هيئة زرار كامل متوافق مع شاشات الهواتف
                             if st.button(line_text, key=f"full_{formatted_id}", use_container_width=True):
                                 st.session_state["play_full_url"] = audio_link
                                 st.session_state["play_full_title"] = f"{selected_reciter} - سورة {surah_name}"
 
 st.write("---")
 
-# مشغل الصوت التلقائي يظهر في الأسفل عند الضغط على أي سطر
 if "play_full_url" in st.session_state:
     st.subheader("🎧 مشغل الصوت الحالي:")
     st.success(f"▶️ أنت تستمع الآن إلى: {st.session_state['play_full_title']}")
-    
     st.audio(st.session_state["play_full_url"], format="audio/mp3", autoplay=True)
     st.caption("⚙️ مشغل الصوت هذا قيد التطوير لإضافة مزايا جديدة قريباً.")
